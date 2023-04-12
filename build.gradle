@@ -1,0 +1,19 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	implementation 'com.formdev:flatlaf:3.1'
+	implementation 'org.jclarion:image4j:0.7'
+	implementation 'net.lingala.zip4j:zip4j:2.11.5'
+	implementation 'com.google.code.gson:gson:2.9.1'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'net.app.Main'
+}
