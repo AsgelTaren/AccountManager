@@ -1,7 +1,10 @@
 package net.app.data;
 
-import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -21,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -63,6 +67,7 @@ public class DataBasePanel extends JPanel {
 		loadSingleIcon("domain");
 		loadSingleIcon("upload");
 		loadSingleIcon("user");
+		loadSingleIcon("icon");
 	}
 
 	private static final void loadSingleIcon(String id) {
@@ -105,11 +110,21 @@ public class DataBasePanel extends JPanel {
 		icons = new HashMap<String, ImageIcon>();
 		reloadIcons();
 
+		setBorder(BorderFactory.createTitledBorder("Accounts"));
+
 		buildTree();
 		renderer = new CustomRenderer(this);
 		tree.setCellRenderer(renderer);
-		setLayout(new BorderLayout());
-		add(new JScrollPane(tree), BorderLayout.CENTER);
+		setLayout(new GridBagLayout());
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.weightx = gbc.weighty = gbc.gridwidth = gbc.gridheight = 1;
+		gbc.gridx = gbc.gridy = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(5, 5, 5, 5);
+
+		add(new JScrollPane(tree), gbc);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 		tree.addMouseListener(new MouseAdapter() {
@@ -122,8 +137,11 @@ public class DataBasePanel extends JPanel {
 					}
 				}
 				if (SwingUtilities.isRightMouseButton(e)) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath()
-							.getLastPathComponent();
+					TreePath path =  tree.getSelectionPath();
+					if(path == null) {
+						return;
+					}
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
 					Object o = node.getUserObject();
 					if (o instanceof Domain d) {
 						forDomain(node, d).show(e.getComponent(), e.getX(), e.getY());
@@ -161,7 +179,11 @@ public class DataBasePanel extends JPanel {
 
 		search = new JTextField();
 		search.setToolTipText("Search");
-		add(search, BorderLayout.NORTH);
+		search.setPreferredSize(new Dimension(150, 25));
+		gbc.weighty = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridy = 0;
+		add(search, gbc);
 		search.addActionListener(e -> {
 			tree.clearSelection();
 			Pattern p = Pattern.compile(search.getText(), Pattern.CASE_INSENSITIVE);
@@ -216,11 +238,12 @@ public class DataBasePanel extends JPanel {
 	}
 
 	public void downloadIcons() {
-		for (Entry<String, Domain> entry : database.getDomains().entrySet()) {
-			if (!entry.getValue().getData(DomainData.URL).equals("<None>")) {
-				downloadIcon(entry.getValue());
-			}
-		}
+		Thread thread = new Thread(() -> {
+			DownloadIconsDialog dial = new DownloadIconsDialog(this);
+			dial.showDialog();
+			dial.download();
+		});
+		thread.start();
 	}
 
 	public void downloadIcon(Domain d) {
@@ -487,6 +510,10 @@ public class DataBasePanel extends JPanel {
 
 	public DataBase getDataBase() {
 		return database;
+	}
+
+	public JFrame getJFrame() {
+		return frame;
 	}
 
 }

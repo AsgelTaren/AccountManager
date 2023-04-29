@@ -26,7 +26,7 @@ public class DomainPanel extends JDialog {
 	private JButton save;
 
 	public DomainPanel(JFrame parent, Domain dom, DataBasePanel panel, boolean edit) {
-		super(parent,dom.toString(), true);
+		super(parent, dom.toString(), true);
 		setLayout(new GridBagLayout());
 
 		JPanel sub = new JPanel();
@@ -84,6 +84,7 @@ public class DomainPanel extends JDialog {
 		}
 
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	public void showDialog() {

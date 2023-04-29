@@ -34,6 +34,9 @@ public class CustomRenderer extends DefaultTreeCellRenderer {
 		if (data instanceof Account) {
 			res.setIcon(DataBasePanel.menuIcons.get("user"));
 		}
+		if (data instanceof String) {
+			res.setIcon(DataBasePanel.menuIcons.get("icon"));
+		}
 		return res;
 	}
 

@@ -84,6 +84,7 @@ public class AccountPanel extends JDialog {
 		}
 
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	public void showDialog() {
